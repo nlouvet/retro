@@ -1,0 +1,158 @@
+#include <avr/pgmspace.h>
+
+const int motorPin =  20;
+const int replayPin =  21;
+const int recordPin =  22;
+
+const int ledPin = 6;
+
+// we keep output value to toggle without reading
+int value = 1;
+
+// The setup() method runs once, when the sketch starts
+
+void setup()   {                
+  // initialize the digitals pin as an outputs
+  pinMode(motorPin, INPUT);
+  pinMode(replayPin, OUTPUT);
+  pinMode(recordPin, INPUT);
+  pinMode(ledPin, OUTPUT);
+
+  // force to low to avoid MO5 error 60
+  digitalWrite(replayPin, HIGH);
+  value=1;  
+}
+
+// helper function to make the led blink
+void blink(int num,int time) {
+  int i;
+  for (i=0;i<num;i++) {
+    digitalWrite(ledPin, HIGH);   // set the LED on
+    delay(time);                  // wait for a second
+    digitalWrite(ledPin, LOW);    // set the LED off
+    delay(time);                  // wait for a second
+  }
+}
+
+
+
+// ================= 1200 bauds legacy part ==================================
+void mtoggle(void) {
+  if (value==1) {
+    digitalWrite(replayPin, LOW);
+//    digitalWrite(ledPin, LOW);  
+    value=0;    
+  }
+  else
+  {
+    digitalWrite(replayPin, HIGH);
+//    digitalWrite(ledPin, HIGH);   // set the LED on
+    value=1;    
+  }
+}
+// 
+// 1/1200= 832 microsec
+// 1/2400= 416 microsec
+
+void sendBit1200(int bit) {
+  if (bit==0) {
+    delayMicroseconds(832);
+    mtoggle();
+  }
+  else {
+    delayMicroseconds(416);
+    mtoggle();
+    delayMicroseconds(416);
+    mtoggle();
+  }
+}
+
+// with real parts of fool's k52wav inside ;)
+void sendByte1200(unsigned char c) {
+  int i;
+
+  for (i=8;i>0;i--)
+    if (c&(1<<(i-1))) sendBit1200(1); else sendBit1200(0);
+
+}
+
+// the loop() method runs over and over again
+#define k7_data_BLOCK_SIZE 22549
+
+extern PROGMEM prog_uchar  k7_data[22549];
+
+int where=0;
+
+
+unsigned char myfgetc(void) {
+  if (where<k7_data_BLOCK_SIZE) {
+      where++;
+      return pgm_read_byte_near(k7_data+where-1);
+  }
+  return 0;
+}
+
+int is_eof(void) {
+  if (where>=k7_data_BLOCK_SIZE) return 1;
+  return 0;
+}
+
+void sendFile1200(void) {
+  unsigned char c,b;
+  int i,j,l;
+  do
+  {
+    do
+    {
+      c=myfgetc();
+    } while (c==1);
+
+    b=1;
+    for (j=0;j<16;j++) sendByte1200(b);
+
+    if (c==60)
+    {
+      sendByte1200(c);
+      c=myfgetc();
+      if (c==90)
+      {
+        sendByte1200(c);
+        b=myfgetc();
+        sendByte1200(b);
+        c=myfgetc();
+        sendByte1200(c);
+        l=c;
+        if (l==0) l=256;
+
+        for (i=0;i<l-2;i++)
+        {
+          c=myfgetc();
+          sendByte1200(c);
+        }
+        c=myfgetc();
+        sendByte1200(c);
+      } 
+    }
+    digitalWrite(replayPin, HIGH);
+    value=1;
+ 
+    blink(8,125);
+    if (digitalRead(motorPin)) break;
+  } while (!(is_eof()));
+}
+
+void loop()                     
+{
+  int i;
+  delay(2000);
+  blink(2,250);
+  digitalWrite(replayPin, HIGH);
+  value=1;
+  
+  // wait for motor on to come up
+  if (!digitalRead(motorPin)) {
+    blink(4,250);
+    sendFile1200();    
+    blink(4,250);
+  }
+}
