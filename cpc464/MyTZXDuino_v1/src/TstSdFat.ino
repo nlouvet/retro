@@ -53,6 +53,7 @@ void setup() {
   Serial.begin(115200);
 
   oled.begin(&Adafruit128x64, OLED_I2C_ADD);
+  //oled.begin(&SH1106_128x64, OLED_I2C_ADD);
   oled.setFont(System5x7);
 
   oled.clear();
