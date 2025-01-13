@@ -1,47 +1,6 @@
 #include "magneto.hpp"
 
 // ***************************************************************************
-// K7 class functions definitions
-// ***************************************************************************
-
-void K7::failure(const __FlashStringHelper* msg) {
-  Serial.print(F("K7 FAILURE: "));
-  Serial.println(msg);
-  while(1);
-}
-
-K7::K7() {
-	file_ptr = NULL;
-}
-
-K7::K7(File *fptr) {
-	file_ptr = fptr;
-}
-
-K7::~K7() {
-	file_ptr = NULL;
-}
-
-bool K7::available() {
-	return file_ptr->available() > 0; // ???
-}
-
-void K7::rewind() {
-	file_ptr->rewind();
-}
-
-int32_t K7::add(const byte *src, uint32_t size) { // ???
-	uint32_t nbwr = file_ptr->write(src, size);
-	if(nbwr == 0) return -1;
-	else return nbwr;
-}
-
-int32_t K7::read(byte *dst, uint32_t size) {
-	return file_ptr->read(dst, size); // ???
-	return 0;
-}
-
-// ***************************************************************************
 // magneto class functions definitions
 // ***************************************************************************
 

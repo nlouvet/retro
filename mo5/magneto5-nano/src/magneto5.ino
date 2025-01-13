@@ -2,7 +2,15 @@
 #include <SdFat.h>
 
 #include "serpackets.hpp"
+#include "tape.hpp"
 #include "magneto.hpp"
+
+// SPI micro SD card reader, Arduino Nano:
+// SCK -> D13
+// MISO -> D12
+// MOSI -> D11
+// CS -> D10
+#define SD_CARD_CS 10
 
 void failure(const __FlashStringHelper* msg) {
 	Serial.print(F("FAILURE: "));
@@ -33,7 +41,7 @@ void setup() {
 		failure(F("Unable to open the file..."));
 	success(F("Temporary file open!"));
 
-	K7 k7(&file);
+	tape k7(&file);
 
 	Serial.println(F("READY"));
 
@@ -45,7 +53,7 @@ void setup() {
 	send_ready();
 	num_exp = wait_prelude();
 	while((s = wait_data(buffer)) > 0) {
-		k7.add(buffer, s);
+		k7.write(buffer, s);
 		num_rcv += s;
 		send_ack();
 	}
@@ -61,7 +69,6 @@ void setup() {
 	}
 
 	magneto M(k7);
-
 	M.read_k7();
 
 	Serial.println(F("END"));
