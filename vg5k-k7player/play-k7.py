@@ -3,6 +3,10 @@
 # see https://github.com/linuxforum5/vg5000utils/blob/main/src/vg5000k72wav.c
 # https://github.com/linuxforum5/vg5000utils/tree/main
 # http://vg5000bazar.free.fr/html/articles/header_k7.htm
+# https://github.com/richpl/PyBasic/tree/master
+# https://www.triceraprog.fr/tag/vg5000.html
+# https://github.com/Triceraprog/vg5000_tools/tree/master
+
 
 import numpy as np
 import sounddevice as sd
