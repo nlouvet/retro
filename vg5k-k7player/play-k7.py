@@ -22,7 +22,7 @@ import math, os
 # 2400 bauds -> t = 400us = 0.0004s
 
 
-AMPLITUDE = 0.7
+AMPLITUDE = 0.8
 SAMPLERATE = 44100.0 # Hz
 SAMPLEDT = 1.0 / SAMPLERATE;
 NSAMPDIV4 = math.ceil(200.0 * SAMPLERATE * 1e-6)
@@ -93,16 +93,28 @@ class Player:
 		self.set_silence()
 		self.set_leading()
 		
-		d = f.read(32)
-		l = len(d)
+		# we first read the 32 header bytes
+		header = f.read(32)
+		l = len(header)
 		if l != 32:
-			print("pb")
+			print("we've got a problem...")
 		for i in range(0, l):
-			self.set_byte(d[i])
+			self.set_byte(header[i])
+
+		self.print_header_info(header)
 		
 		self.set_silence()
 		self.set_leading()
 		
+		# then we read the begining sequence of ten 0xd3 bytes
+		bseq = f.read(10)
+		l = len(bseq)
+		if l != 10:
+			print("we've got a problem...")
+		for i in range(0, l):
+			self.set_byte(bseq[i])
+		
+		checksum = 0
 		while True:
 			d = f.read(256)
 			l = len(d)
@@ -111,12 +123,29 @@ class Player:
 			else:
 				for i in range(0, l):
 					self.set_byte(d[i])
+					checksum = (checksum + d[i]) % 65536
 		
 		f.close()
 		
 		self.set_silence()
 		
+		print("computed checksum = {}".format(checksum))
 		print("{} loaded and ready to play".format(file))
+	
+	def print_header_info(self, header):
+		type = header[10:11] # 1 byte
+		name = header[11:17].decode('ascii') # 6 bytes
+		size = int.from_bytes(header[28:30], 'little') # 2 bytes
+		chks = int.from_bytes(header[30:32], 'little') # 2 bytes
+		print("header content:")
+		print("- file type  = 0x{} = '{}'".format(type.hex(), type.decode('ascii')))
+		print("- file name  = '{}'".format(name))
+		print("- data size  = {} bytes".format(size))
+		# total size = data size + 32 bytes header
+		#              + 10 0xd6 begining bytes
+		#              + 10 0x00 ending bytes
+		print("- total size = {} bytes".format(size + 52))
+		print("- checksum   = {} = {}".format(hex(chks), chks))
 	
 	def play(self):
 		print("start playing")
@@ -129,5 +158,5 @@ class Player:
 #print(len(t))
 #sd.play(d, samplerate=SAMPLERATE, blocking=True, loop=False)
 
-p = Player("tetris_vg5000.k7")
+p = Player("blitz_vg5000.k7")
 p.play()
