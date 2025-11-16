@@ -65,9 +65,18 @@ class Converter:
 		block += b'\x00'
 		block += b'\x00' * 5
 		block += b'\x00' * 3
-		block += b'\xFC\x49'
+		if self.conv_type == 'bask_tok':
+			block += b'\xFC\x49'
+		elif self.conv_type == 'binary':
+			block += self.start_add.to_bytes(2, 'little')
+		else:
+			block += b'\xff\xff'
+		# data length
 		block += len(self.data).to_bytes(2, 'little')
+		print(len(self.data))
+		# checksum
 		block += self.checksum().to_bytes(2, 'little')
+		# 10 bytes 0xD6
 		block += b'\xD6' * 10
 		return block
 	
