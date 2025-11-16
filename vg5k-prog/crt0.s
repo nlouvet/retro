@@ -1,11 +1,12 @@
-		;; crt0.s
+	;; crt0.s
         ;; 
         ;; zx spectrum 48K ram startup code
-		;;
+	;;
         ;; MIT License (see: LICENSE)
         ;; Copyright (C) 2021 Tomaz Stih
         ;;
-		;; 2021-06-16   tstih
+	;; 2021-06-16   tstih
+	
 	.module crt0
 	.globl	_main
 	.globl    l__INITIALIZER
