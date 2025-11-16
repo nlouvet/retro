@@ -36,12 +36,12 @@ Z80 CPU;
 //autres variables globales
 int nline;           //numero de la ligne ecran a afficher
 int cycleline;       //nombre de cycles depuis le dernier affichage ligne
-int cycleirq;        //nombre de cycles depuis la dernière IRQ
+int cycleirq;        //nombre de cycles depuis la derniï¿½re IRQ
 int cycleblink;      //nombre de cycles depuis le dernier clignotement
 int cyclesperline;   //nombre de cycles par affichage ligne
 int cyclesperirq;    //nombre de cycles par irq
 int cyclesperblink;  //nombre de cycles par clignotement
-int keyscan[256];    //disposition actuelle du clavier en cours d'édition
+int keyscan[256];    //disposition actuelle du clavier en cours d'ï¿½dition
 int sound;           //niveau du haut-parleur
 int pausez80;        //processor pause state
 
@@ -98,17 +98,17 @@ void Initpalette(void)
  for(i = 0; i < 16; i++) Palette(i, r[i], v[i], b[i]);
 }
 
-// Initialisation programme de l'ordinateur émulé ////////////////////////////
+// Initialisation programme de l'ordinateur ï¿½mulï¿½ ////////////////////////////
 void Initprog()
 {
  int i;   
  CPU.PC.W = 0x0033;
  sound = 0;
  for(i = 0x07; i < 0x09; i++) ioport[i] = 0xff; //joysticks au repos
- for(i = 0x80; i < 0x88; i++) ioport[i] = 0xff; //touches relachées
+ for(i = 0x80; i < 0x88; i++) ioport[i] = 0xff; //touches relachï¿½es
 }
 
-// Hardreset de l'ordinateur émulé ///////////////////////////////////////////
+// Hardreset de l'ordinateur ï¿½mulï¿½ ///////////////////////////////////////////
 void Hardreset()
 {
  int i;
@@ -121,6 +121,7 @@ void Hardreset()
  InitEF9345();                             //initialisation EF9345  
  //raz de la ram
  for(i = 0; i < sizeof(ram); i++) ram[i] = 0;        //ram a zero
+ printf("sizeof(ram) = %ld\n", sizeof(ram));
  //patch de la rom
  rom[0x3aa9] = 0xed; rom[0x3aaa] = 0xfe;    //ecriture cassette
  rom[0x3af3] = 0xed; rom[0x3af4] = 0xfe;    //test vitesse k7
@@ -129,7 +130,7 @@ void Hardreset()
  rom[0x3a81] = 0xc9;                        //signaux de synchro
  //initialisation clavier
  for(i = 0x07; i < 0x09; i++) ioport[i] = 0xff;      //joysticks au repos
- for(i = 0x80; i < 0x88; i++) ioport[i] = 0xff;      //touches relachées
+ for(i = 0x80; i < 0x88; i++) ioport[i] = 0xff;      //touches relachï¿½es
  //autres initialisations
  Initpalette();                            //initialisation palette
  ResetZ80(&CPU);                           //initialisation processeur
@@ -161,14 +162,17 @@ int Run(int n)
 void WrZ80(word w, byte c)
 {
  int a = w & 0xffff;
- if(a >= 0x4000) ram[a - 0x4000] = c;
+ //if(a >= 0x4000) ram[a - 0x4000] = c;
+ if(0x4000 <= a && a < 0x8000) ram[a - 0x4000] = c;
 }  
 
 // Lecture memoire VG5000 /////////////////////////////////////////////////////
 byte RdZ80(word w)
 {
- int a = w & 0xffff;   
- return((a < 0x4000) ? rom[a] : ram[a - 0x4000]);
+ int a = w & 0xffff;
+ //return((a < 0x4000) ? rom[a] : ram[a - 0x4000]);
+ if( a < 0x8000) return((a < 0x4000) ? rom[a] : ram[a - 0x4000]);
+ else return 0x00;
 }
 
 // IO output //////////////////////////////////////////////////////////////////

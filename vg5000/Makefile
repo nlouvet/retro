@@ -1,6 +1,6 @@
 # Project: dcvg5k
 
-CC = gcc -Wall
+CC = gcc -Wall -g
 
 objects = object/dcvg5kmain.o object/Z80.o object/dasmz80.o \
 	object/dcef9345.o object/dcvg5kdesass.o object/dcvg5kboutons.o \
