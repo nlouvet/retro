@@ -32,10 +32,8 @@
         push    de
         push    hl
 
-        call    gsinit                  ; call SDCC init code
-
-        ;; call C main function
-        call    _main
+        call    gsinit       ; call SDCC init code
+        call    _main        ; call C main function
 
         ;; restore all regs
         pop     hl
@@ -61,9 +59,9 @@
         ;;	in the desired order
         .area   _HOME
         .area	_CODE
-        .area   _INITIALIZER
         .area   _GSINIT
         .area   _GSFINAL
+        .area   _INITIALIZER
         .area   _INITIALIZED
         .area   _DATA
         .area   _BSS

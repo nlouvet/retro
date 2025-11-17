@@ -36,4 +36,4 @@ helloc.bin: helloc.c crt0.s
 
 clean:
 	rm -f *.bas *.k7 *.bin
-	rm -f *.adb *.cdb *.lk *.lst *.map *.noi *.rel *.sym
+	rm -f *.ihx *.adb *.cdb *.lk *.lst *.map *.noi *.rel *.sym

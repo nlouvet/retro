@@ -8,17 +8,15 @@ void test() __naked
 void print(char *ch) {
     __asm
     ld iy,#2
-    add iy,sp ;Bypass the return address of the function 
-
-    ld l,(iy)   ;x
-    ld h,1(iy)  ;y
+    add iy,sp    ; bypass the return address of the function 
+    ld l,(iy)    ; x
+    ld h,1(iy)   ; y
     call #0x36AA
     __endasm;
 }
 
-char hello[7] = "Hello\0";
-
 void main() {
+  char hello[7] = "Hello\0";
   /*test();*/
   print(hello);
 }

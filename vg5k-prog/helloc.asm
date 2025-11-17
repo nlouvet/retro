@@ -11,7 +11,6 @@
 	.globl _main
 	.globl _print
 	.globl _test
-	.globl _hello
 ;--------------------------------------------------------
 ; special function registers
 ;--------------------------------------------------------
@@ -23,9 +22,6 @@
 ; ram data
 ;--------------------------------------------------------
 	.area _INITIALIZED
-G$hello$0_0$0==.
-_hello::
-	.ds 7
 ;--------------------------------------------------------
 ; absolute external ram data
 ;--------------------------------------------------------
@@ -89,33 +85,65 @@ _print::
 	ret
 	G$main$0$0	= .
 	.globl	G$main$0$0
-	C$helloc.c$21$1_0$4	= .
-	.globl	C$helloc.c$21$1_0$4
-;helloc.c:21: void main() {
+	C$helloc.c$19$1_0$4	= .
+	.globl	C$helloc.c$19$1_0$4
+;helloc.c:19: void main() {
 ;	---------------------------------
 ; Function main
 ; ---------------------------------
 _main::
-	C$helloc.c$23$1_0$4	= .
-	.globl	C$helloc.c$23$1_0$4
-;helloc.c:23: print(hello);
-	ld	hl, #_hello
-	push	hl
+	ld	hl, #-7
+	add	hl, sp
+	ld	sp, hl
+	C$helloc.c$20$2_0$4	= .
+	.globl	C$helloc.c$20$2_0$4
+;helloc.c:20: char hello[7] = "Hello\0";
+	ld	hl, #0x0000
+	add	hl, sp
+	ex	de, hl
+	ld	a, #0x48
+	ld	(de), a
+	ld	l, e
+	ld	h, d
+	inc	hl
+	ld	(hl), #0x65
+	ld	l, e
+	ld	h, d
+	inc	hl
+	inc	hl
+	ld	(hl), #0x6c
+	ld	l, e
+	ld	h, d
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	(hl), #0x6c
+	ld	hl, #0x0004
+	add	hl, de
+	ld	(hl), #0x6f
+	ld	hl, #0x0005
+	add	hl, de
+	ld	(hl), #0x00
+	ld	hl, #0x0006
+	add	hl, de
+	ld	(hl), #0x00
+	C$helloc.c$22$1_0$4	= .
+	.globl	C$helloc.c$22$1_0$4
+;helloc.c:22: print(hello);
+	push	de
 	call	_print
 	pop	af
-	C$helloc.c$24$1_0$4	= .
-	.globl	C$helloc.c$24$1_0$4
-;helloc.c:24: }
-	C$helloc.c$24$1_0$4	= .
-	.globl	C$helloc.c$24$1_0$4
+	C$helloc.c$23$1_0$4	= .
+	.globl	C$helloc.c$23$1_0$4
+;helloc.c:23: }
+	ld	hl, #7
+	add	hl, sp
+	ld	sp, hl
+	C$helloc.c$23$1_0$4	= .
+	.globl	C$helloc.c$23$1_0$4
 	XG$main$0$0	= .
 	.globl	XG$main$0$0
 	ret
 	.area _CODE
 	.area _INITIALIZER
-Fhelloc$__xinit_hello$0_0$0 == .
-__xinit__hello:
-	.ascii "Hello"
-	.db 0x00
-	.db 0x00
 	.area _CABS (ABS)
