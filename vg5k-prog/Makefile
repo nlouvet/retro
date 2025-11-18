@@ -24,13 +24,14 @@ hello.bin: hello.asm
 helloc.k7: helloc.bin
 	./VG5KConv2k7.py --type binary --start 0x7000 helloc.bin helloc.k7 HELLOC
 
+# --debug --nostdinc --no-std-crt0 --nostdlib \
 helloc.bin: helloc.c crt0.s
 	sdasz80 -xlos -g crt0.s
 	sdcc -o helloc.rel -c --std-c11 -mz80 \
-		--debug --nostdinc --no-std-crt0 --nostdlib \
+		--debug --no-std-crt0 --nostdlib \
 		helloc.c
 	sdcc -o helloc.ihx -mz80 -Wl -y --code-loc 0x7000 --data-loc 0x7100 --std-c11 \
-		--debug --no-std-crt0 --nostdinc --nostdlib \
+		--debug --no-std-crt0  --nostdlib \
 		crt0.rel helloc.rel
 	sdobjcopy -I ihex -O binary helloc.ihx helloc.bin
 
