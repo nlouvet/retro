@@ -25,6 +25,7 @@ helloc.k7: helloc.bin
 	./VG5KConv2k7.py --type binary --start 0x7000 helloc.bin helloc.k7 HELLOC
 
 # --debug --nostdinc --no-std-crt0 --nostdlib \
+
 helloc.bin: helloc.c crt0.s
 	sdasz80 -xlos -g crt0.s
 	sdcc -o helloc.rel -c --std-c11 -mz80 \
